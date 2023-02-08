@@ -1,6 +1,7 @@
 from detectron2.modeling import build_model
 from detectron2.config import get_cfg
 from detectron2.engine.defaults import DefaultPredictor
+import importlib
 
 class ARGS():
     # A fake args read by initializing the object
@@ -30,10 +31,14 @@ def setup_cfg(args):
 
 
 
-def build_model_(cfg):
+def build_model_():
     '''
     To read the predictor's structure
     '''
     args = ARGS()
     cfg = setup_cfg()
     return build_model(cfg)
+
+
+def clear_import(module):
+    importlib.reload(module)
