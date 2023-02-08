@@ -1,0 +1,13 @@
+# ninja log v5
+6	8462	1675070477016456502	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/box_iou_rotated/box_iou_rotated_cpu.o	989537aa75738dab
+6	9808	1675070478351426652	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/cocoeval/cocoeval.o	c3d98b925affeb7f
+6	10268	1675070478821416143	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/nms_rotated/nms_rotated_cpu.o	24d674aac528b051
+5	11983	1675070480529377953	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/ROIAlign/ROIAlign_cpu.o	5024fb654a895f38
+5	12366	1675070480917369278	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/ROIAlignRotated/ROIAlignRotated_cpu.o	8b0c781b3575c511
+6	33971	1675070502493886822	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/vision.o	2ff5848417a7fcf6
+8	8518	1675070512598660876	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/box_iou_rotated/box_iou_rotated_cpu.o	dbdbcdab0561349
+9	10019	1675070514097627359	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/nms_rotated/nms_rotated_cpu.o	6cf42efff12a5f2
+9	10217	1675070514287623111	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/cocoeval/cocoeval.o	4f4f53cea5739f79
+8	11982	1675070515988585076	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/ROIAlignRotated/ROIAlignRotated_cpu.o	3d3b10e1e955aca6
+8	12003	1675070516073583176	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/ROIAlign/ROIAlign_cpu.o	e83fae145d82d179
+10	33773	1675070537821096891	/home/yizhi/transfiner/build/temp.linux-x86_64-cpython-37/home/yizhi/transfiner/detectron2/layers/csrc/vision.o	9d13fed41f8640bd
