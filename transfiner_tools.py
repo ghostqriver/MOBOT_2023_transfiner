@@ -33,7 +33,6 @@ def setup_cfg(args):
     return cfg
 
 
-
 def build_model_():
     '''
     To read the predictor's structure
