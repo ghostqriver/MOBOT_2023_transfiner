@@ -2,12 +2,19 @@ import logging
 import os
 from collections import OrderedDict
 import torch
+from torch.nn.parallel import DistributedDataParallel
 
 import detectron2.utils.comm as comm
-from detectron2.checkpoint import DetectionCheckpointer
+from detectron2.checkpoint import DetectionCheckpointer, PeriodicCheckpointer
 from detectron2.config import get_cfg
-from detectron2.data import MetadataCatalog
-from detectron2.engine import DefaultTrainer, default_argument_parser, default_setup, hooks, launch
+from detectron2.data import (
+    MetadataCatalog,
+    build_detection_test_loader,
+    build_detection_train_loader,
+)
+from detectron2.engine import  default_setup, default_writers, launch,hooks
+from mobot.engine import mobot_argument_parser
+import mobot.engine.Mobot_DefaultTrainer as Trainer
 from detectron2.evaluation import (
     CityscapesInstanceEvaluator,
     CityscapesSemSegEvaluator,
@@ -17,11 +24,16 @@ from detectron2.evaluation import (
     LVISEvaluator,
     PascalVOCDetectionEvaluator,
     SemSegEvaluator,
-    verify_results,
+    inference_on_dataset,
+    print_csv_format,
+    verify_results
 )
-from detectron2.modeling import GeneralizedRCNNWithTTA
+from detectron2.modeling import build_model
+from detectron2.solver import build_lr_scheduler, build_optimizer
+from detectron2.utils.events import EventStorage
 
 
+logger = logging.getLogger("detectron2")
 
 # If call by functions
 # class ARGS:
@@ -73,28 +85,35 @@ def setup(args):
 def main(args):
     cfg = setup(args)
 
-    model = build_model(cfg)
-    logger.info("Model:\n{}".format(model))
     if args.eval_only:
+        model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
             cfg.MODEL.WEIGHTS, resume=args.resume
         )
-        return do_test(cfg, model)
+        res = Trainer.test(cfg, model)
+        if cfg.TEST.AUG.ENABLED:
+            res.update(Trainer.test_with_TTA(cfg, model))
+        if comm.is_main_process():
+            verify_results(cfg, res)
+        return res
 
-    distributed = comm.get_world_size() > 1
-    if distributed:
-        model = DistributedDataParallel(
-            model, device_ids=[comm.get_local_rank()], broadcast_buffers=False
+    trainer = Trainer(cfg)
+    trainer.resume_or_load(resume=args.resume)
+    if cfg.TEST.AUG.ENABLED:
+        trainer.register_hooks(
+            [hooks.EvalHook(0, lambda: trainer.test_with_TTA(cfg, trainer.model))]
         )
-
-    do_train(cfg, model, resume=args.resume)
-    return do_test(cfg, model)
+    return trainer.train()
+  
 
 
 if __name__ == "__main__":
-    args = default_argument_parser().parse_args()
-    print(args)
+    args = mobot_argument_parser().parse_args()
     print("Command Line Args:", args)
+
+    # Launch multi-gpu or distributed training
+    # detectron2.engine.launch
+    # world_size = args.num_machines * args.num_gpus
     launch(
         main,
         args.num_gpus,

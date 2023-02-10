@@ -1,3 +1,14 @@
+import argparse
+import sys
+import os
+
+from detectron2.engine import DefaultTrainer
+from detectron2.data import MetadataCatalog
+from detectron2.evaluation import (   
+    COCOEvaluator,
+    DatasetEvaluators,
+)
+
 def mobot_argument_parser(epilog=None):
     """
     Create a parser with some arguments we will use.
@@ -25,7 +36,7 @@ def mobot_argument_parser(epilog=None):
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--CONFIG_FILE", default="", metavar="FILE", help="path to config file")
+    parser.add_argument("--config-file", default="", metavar="FILE", help="path to config file")
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -60,3 +71,24 @@ For python-based LazyConfig, use "path.key=value".
         nargs=argparse.REMAINDER,
     )
     return parser
+
+
+def Mobot_DefaultTrainer(DefaultTrainer):
+
+    @classmethod
+    def build_evaluator(cls, cfg, dataset_name, output_folder=None):
+        
+        if output_folder is None:
+            output_folder = os.path.join(cfg.OUTPUT_DIR, "inference")
+        
+        evaluator_list = []
+        evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
+
+        if evaluator_type in ["coco", "coco_panoptic_seg"]:
+            evaluator_list.append(COCOEvaluator(dataset_name, output_dir=output_folder))
+
+        if len(evaluator_list) == 1:
+            return evaluator_list[0]
+            
+        return DatasetEvaluators(evaluator_list)
+  
