@@ -13,8 +13,8 @@ from detectron2.data import (
     build_detection_train_loader,
 )
 from detectron2.engine import  default_setup, default_writers, launch,hooks
-from mobot.engine import mobot_argument_parser
-import mobot.engine.Mobot_DefaultTrainer as Trainer
+from mobot.engine import mobot_argument_parser,Mobot_Dataset_Register
+from mobot.engine import Mobot_DefaultTrainer as Trainer
 from detectron2.evaluation import (
     CityscapesInstanceEvaluator,
     CityscapesSemSegEvaluator,
@@ -36,37 +36,45 @@ from detectron2.utils.events import EventStorage
 logger = logging.getLogger("detectron2")
 
 # If call by functions
-# class ARGS:
-    # def __init__(
-#             self, MODEL_DIR, OUTPUT_DIR, BASE_LR, MAX_ITER, 
-#             CHECKPOINT_PERIOD, EVAL_PERIOD, STEPS=[],
-#             MODEL_CKPT=None, config_file="COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
-#             ):
-#         self.MODEL_DIR,self.OUTPUT_DIR = MODEL_DIR,OUTPUT_DIR
-#         self.BASE_LR,self.MAX_ITER = BASE_LR,MAX_ITER
-#         self.STEPS = STEPS
-#         self.CHECKPOINT_PERIOD = CHECKPOINT_PERIOD
-#         self.EVAL_PERIOD = EVAL_PERIOD
-#         self.MODEL_CKPT = MODEL_CKPT
-#         self.BACKBONE = BACKBONE
+class ARGS:
+    def __init__(
+            self,config_file=None,model=None,train=None,test=None,batch_size=None,
+            base_ir=None,max_iter=None,checkpoint_period=None,eval_period=None,
+            resume=None,eval_only=None,num_gpus=1,num_machines=1,machine_rank=0,dist_url=None
+            ):
+        self.config_file = config_file
+        self.model = model
+        self.train = train
+        self.test = test
+        self.batch_size=batch_size
+        self.base_ir = base_ir
+        self.max_iter = max_iter
+        self.checkpoint_period = checkpoint_period
+        self.eval_period = eval_period
+        self.resume = resume
+        self.eval_only = eval_only
+        self.num_gpus = num_gpus
+        self.num_machines = num_machines 
+        self.machine_rank = machine_rank
+        self.dist_url = dist_url
 
 def setup(args):
     cfg = get_cfg()
-    cfg.merge_from_file(args.CONFIG_FILE)
-    model_path = os.path.join(args.MODEL_DIR, "{}.pth".format(args.MODEL_CKPT)) 
-    cfg.MODEL.WEIGHTS = model_path
-    print('Use model weights from:', model_path)
+    cfg.merge_from_file(args.config_file)
+    print('Merge the config file from:',args.config_file)
+    cfg.MODEL.WEIGHTS = args.model
+    print('Use model weights from:', args.model)
  
     default_setup(
         cfg, args
     )
 
-    cfg.DATASETS.TRAIN = args.TRAIN
-    cfg.DATASETS.TEST = args.TEST
-    print('Training set:',args.TRAIN)
-    print('Validation set:',args.TEST)
+    cfg.DATASETS.TRAIN = args.train
+    cfg.DATASETS.TEST = args.test
+    print('Training set:',args.train)
+    print('Validation set:',args.test)
 
-    cfg.SOLVER.IMS_PER_BATCH = args.BATCH_SIZE 
+    cfg.SOLVER.IMS_PER_BATCH = args.batch_size
     
     cfg.DATALOADER.NUM_WORKERS = 2 
     cfg.DATALOADER.SHUFFLE = True
@@ -74,17 +82,20 @@ def setup(args):
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set the testing threshold for this model
     cfg.OUTPUT_DIR=args.OUTPUT_DIR
-    cfg.SOLVER.BASE_LR = args.BASE_LR # pick a good LR 0.00025
-    cfg.SOLVER.MAX_ITER = args.MAX_ITER
-    cfg.SOLVER.STEPS = args.STEPS    
-    cfg.SOLVER.CHECKPOINT_PERIOD = args.CHECKPOINT_PERIOD # Save the checkpoint each 2000 iterations 
-    cfg.TEST.EVAL_PERIOD = args.EVAL_PERIOD # the period to run eval_function. Set to 0 to not evaluate periodically (but still evaluate after the last iteration if eval_after_train is True).                                   
+    cfg.SOLVER.BASE_LR = args.base_ir # pick a good LR 0.00025
+    cfg.SOLVER.MAX_ITER = args.max_iter
+    # cfg.SOLVER.STEPS = args.steps    
+    cfg.SOLVER.CHECKPOINT_PERIOD = args.checkpoint_period # Save the checkpoint each 2000 iterations 
+    cfg.TEST.EVAL_PERIOD = args.eval_period # the period to run eval_function. Set to 0 to not evaluate periodically (but still evaluate after the last iteration if eval_after_train is True).                                   
     return cfg
 
 
 def main(args):
+    
+    # Register Mobot's dataset
+    Mobot_Dataset_Register()
     cfg = setup(args)
-
+    return cfg
     if args.eval_only:
         model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(

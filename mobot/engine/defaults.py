@@ -3,11 +3,13 @@ import sys
 import os
 
 from detectron2.engine import DefaultTrainer
-from detectron2.data import MetadataCatalog
 from detectron2.evaluation import (   
     COCOEvaluator,
     DatasetEvaluators,
 )
+
+from detectron2.data.datasets import register_coco_instances
+from detectron2.data import MetadataCatalog, DatasetCatalog
 
 def mobot_argument_parser(epilog=None):
     """
@@ -36,7 +38,24 @@ def mobot_argument_parser(epilog=None):
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--config-file", default="", metavar="FILE", help="path to config file")
+    parser.add_argument("--config-file", metavar="FILE", help="path to config file")
+    
+    parser.add_argument("--model", default=None, metavar="FILE", help="path to model")
+
+    parser.add_argument("--train", default=None, help="training set")
+    
+    parser.add_argument("--test", default=None, help="test set")
+
+    parser.add_argument("--batch-size", default=None, help="batch size")
+
+    parser.add_argument("--base-ir", default=None, help="base ir")
+
+    parser.add_argument("--max-iter",default=None, help="max iter")
+    
+    parser.add_argument("--checkpoint-period",default=None, help="checkpoint period")
+
+    parser.add_argument("--eval-period",default=None, help="eval period")
+
     parser.add_argument(
         "--resume",
         action="store_true",
@@ -91,4 +110,57 @@ def Mobot_DefaultTrainer(DefaultTrainer):
             return evaluator_list[0]
             
         return DatasetEvaluators(evaluator_list)
+
+
+def Mobot_Dataset_Register():
+    
+    try:
+        register_coco_instances("MOBOT_Train", {}, "Datasets/Train/Train.json", "Datasets/Train",)
+        
+        register_coco_instances("MOBOT_Train_denoise", {}, "Datasets/Train/Train_denoise.json", "Datasets/Train",)
+        
+        register_coco_instances("MOBOT_Val", {}, "Datasets/Val/Val.json", "Datasets/Val",)   
+
+        register_coco_instances("MOBOT_Val_denoise", {}, "Datasets/Val/Val_denoise.json", "Datasets/Val",)   
+
+        register_coco_instances("MOBOT_Test", {}, "Datasets/Test/Test.json", "Datasets/Test",)   
+
+        register_coco_instances("MOBOT_Test_denoise", {}, "Datasets/Test/Test_denoise.json", "Datasets/Test",)   
+
+
+        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise']:
+            MetadataCatalog.get("MOBOT_"+i).set(thing_classes=['end','side'])
+            MetadataCatalog.get("MOBOT_"+i).set(thing_colors=[(255, 0, 0),(0, 255, 0)])
+
+    except AssertionError:
+        DatasetCatalog.remove("MOBOT_Train")
+        MetadataCatalog.remove("MOBOT_Train")
+        DatasetCatalog.remove("MOBOT_Train_denoise")
+        MetadataCatalog.remove("MOBOT_Train_denoise")
+        DatasetCatalog.remove("MOBOT_Val")
+        MetadataCatalog.remove("MOBOT_Val")
+        DatasetCatalog.remove("MOBOT_Val_denoise")
+        MetadataCatalog.remove("MOBOT_Val_denoise")
+        DatasetCatalog.remove("MOBOT_Test")
+        MetadataCatalog.remove("MOBOT_Test")
+        DatasetCatalog.remove("MOBOT_Test_denoise")
+        MetadataCatalog.remove("MOBOT_Test_denoise")
+        
+        register_coco_instances("MOBOT_Train", {}, "Datasets/Train/Train.json", "Datasets/Train",)
+        
+        register_coco_instances("MOBOT_Train_denoise", {}, "Datasets/Train/Train_denoise.json", "Datasets/Train",)
+        
+        register_coco_instances("MOBOT_Val", {}, "Datasets/Val/Val.json", "Datasets/Val",)   
+
+        register_coco_instances("MOBOT_Val_denoise", {}, "Datasets/Val/Val_denoise.json", "Datasets/Val",)   
+
+        register_coco_instances("MOBOT_Test", {}, "Datasets/Test/Test.json", "Datasets/Test",)   
+
+        register_coco_instances("MOBOT_Test_denoise", {}, "Datasets/Test/Test_denoise.json", "Datasets/Test",)   
+
+
+        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise']:
+            MetadataCatalog.get("MOBOT_"+i).set(thing_classes=['end','side'])
+            MetadataCatalog.get("MOBOT_"+i).set(thing_colors=[(255, 0, 0),(0, 255, 0)])
+ 
   
