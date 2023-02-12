@@ -13,7 +13,7 @@ from detectron2.data import (
     build_detection_train_loader,
 )
 from detectron2.engine import  default_setup, default_writers, launch,hooks
-from mobot.engine import mobot_argument_parser,Mobot_Dataset_Register
+from mobot.engine import mobot_argument_parser,Mobot_Dataset_Register,Mobot_Default_Setting
 from mobot.engine import Mobot_DefaultTrainer as Trainer
 from detectron2.evaluation import (
     CityscapesInstanceEvaluator,
@@ -31,6 +31,7 @@ from detectron2.evaluation import (
 from detectron2.modeling import build_model
 from detectron2.solver import build_lr_scheduler, build_optimizer
 from detectron2.utils.events import EventStorage
+import warnings
 
 
 logger = logging.getLogger("detectron2")
@@ -81,21 +82,23 @@ def setup(args):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 256 
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set the testing threshold for this model
-    cfg.OUTPUT_DIR=args.OUTPUT_DIR
-    cfg.SOLVER.BASE_LR = args.base_ir # pick a good LR 0.00025
-    cfg.SOLVER.MAX_ITER = args.max_iter
+    cfg.OUTPUT_DIR=args.output_dir
+    cfg.SOLVER.BASE_LR = float(args.base_ir) # pick a good LR 0.00025
+    cfg.SOLVER.MAX_ITER = int(args.max_iter)
     # cfg.SOLVER.STEPS = args.steps    
-    cfg.SOLVER.CHECKPOINT_PERIOD = args.checkpoint_period # Save the checkpoint each 2000 iterations 
-    cfg.TEST.EVAL_PERIOD = args.eval_period # the period to run eval_function. Set to 0 to not evaluate periodically (but still evaluate after the last iteration if eval_after_train is True).                                   
+    cfg.SOLVER.CHECKPOINT_PERIOD = int(args.checkpoint_period) # Save the checkpoint each 2000 iterations 
+    cfg.TEST.EVAL_PERIOD = int(args.eval_period) # the period to run eval_function. Set to 0 to not evaluate periodically (but still evaluate after the last iteration if eval_after_train is True).                                   
     return cfg
 
 
 def main(args):
     
+    Mobot_Default_Setting()
+
     # Register Mobot's dataset
     Mobot_Dataset_Register()
+
     cfg = setup(args)
-    return cfg
     if args.eval_only:
         model = Trainer.build_model(cfg)
         DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(

@@ -1,6 +1,7 @@
 import argparse
 import sys
 import os
+import warnings
 
 from detectron2.engine import DefaultTrainer
 from detectron2.evaluation import (   
@@ -10,6 +11,7 @@ from detectron2.evaluation import (
 
 from detectron2.data.datasets import register_coco_instances
 from detectron2.data import MetadataCatalog, DatasetCatalog
+
 
 def mobot_argument_parser(epilog=None):
     """
@@ -46,15 +48,17 @@ def mobot_argument_parser(epilog=None):
     
     parser.add_argument("--test", default=None, help="test set")
 
-    parser.add_argument("--batch-size", default=None, help="batch size")
+    parser.add_argument("--batch-size", type=int, default=1, help="batch size")
 
-    parser.add_argument("--base-ir", default=None, help="base ir")
+    parser.add_argument("--output-dir", default=None, help="output directory")
 
-    parser.add_argument("--max-iter",default=None, help="max iter")
+    parser.add_argument("--base-ir", type=float,default=0.01, help="base ir")
+
+    parser.add_argument("--max-iter",type=int,default=None, help="max iter")
     
-    parser.add_argument("--checkpoint-period",default=None, help="checkpoint period")
+    parser.add_argument("--checkpoint-period",type=int,default=1000, help="checkpoint period")
 
-    parser.add_argument("--eval-period",default=None, help="eval period")
+    parser.add_argument("--eval-period",type=int,default=1000, help="eval period")
 
     parser.add_argument(
         "--resume",
@@ -92,7 +96,7 @@ For python-based LazyConfig, use "path.key=value".
     return parser
 
 
-def Mobot_DefaultTrainer(DefaultTrainer):
+class Mobot_DefaultTrainer(DefaultTrainer):
 
     @classmethod
     def build_evaluator(cls, cfg, dataset_name, output_folder=None):
@@ -164,3 +168,6 @@ def Mobot_Dataset_Register():
             MetadataCatalog.get("MOBOT_"+i).set(thing_colors=[(255, 0, 0),(0, 255, 0)])
  
   
+def Mobot_Default_Setting():
+    # Close the warning
+    warnings.filterwarnings("ignore") 
