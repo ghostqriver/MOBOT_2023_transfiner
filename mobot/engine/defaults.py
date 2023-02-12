@@ -36,7 +36,24 @@ def mobot_argument_parser(epilog=None):
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--config-file", default="", metavar="FILE", help="path to config file")
+    parser.add_argument("--config-file", metavar="FILE", help="path to config file")
+    
+    parser.add_argument("--model", default=None, metavar="FILE", help="path to model")
+
+    parser.add_argument("--train", default=None, help="training set")
+    
+    parser.add_argument("--test", default=None, help="test set")
+
+    parser.add_argument("--batch-size", default=None, help="batch size")
+
+    parser.add_argument("--base-ir", default=None, help="base ir")
+
+    parser.add_argument("--max-iter",default=None, help="max iter")
+    
+    parser.add_argument("--checkpoint-period",default=None, help="checkpoint period")
+
+    parser.add_argument("--eval-period",default=None, help="eval period")
+
     parser.add_argument(
         "--resume",
         action="store_true",
