@@ -42,7 +42,7 @@ def build_model_():
     return build_model(cfg)
 
 
-def clear_import(module):
+def reload(module):
     importlib.reload(module)
 
 
