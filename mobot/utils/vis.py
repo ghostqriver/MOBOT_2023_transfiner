@@ -1,0 +1,9 @@
+c_segm_AP_ends = '#8E2E3E'
+c_segm_AP_sides = '#129F26'
+c_bbox_AP_ends = '#FA88A0'
+c_bbox_AP_sides = '#62ED75'
+c_vline = 'gray'
+linewidth = 0.8
+figsize = (9,9)
+labelsize = 7
+legendsize = 9

@@ -29,7 +29,13 @@ from detectron2.modeling import build_model
 from detectron2.solver import build_lr_scheduler, build_optimizer
 from detectron2.utils.events import EventStorage
 
-from mobot.utils import check_path,read_path,read_filename,read_finalfoldername
+from mobot.utils import (
+    check_path,
+    read_path,
+    read_filename,
+    read_finalfoldername
+    )
+from mobot.utils import (read_scores,plot_test)
 
 logger = logging.getLogger("Mobot")
 
@@ -89,7 +95,13 @@ def setup(args):
     
     # If args.output_dir is None, set it to model's dir
     set_output_dir(args)
-
+    
+    cfg.DATASETS.TRAIN = args.train
+    cfg.DATASETS.TEST = args.test
+    
+    logger.info('Training set:',args.train)
+    logger.info('Validation set:',args.test)
+    
     mobot_default_setup(cfg,args)
     default_setup(
         cfg, args
@@ -140,8 +152,11 @@ def main(args):
         #     verify_results(cfg, res)
         res_dict[model_name] = res
         torch.cuda.empty_cache()
-        
-    np.save(cfg.OUTPUT_DIR+'/'+file_name, res_dict)
+
+        np.save(cfg.OUTPUT_DIR+'/'+file_name, res_dict)
+    
+    plot_test(read_scores(res_dict))
+
     # return res_list
   
 

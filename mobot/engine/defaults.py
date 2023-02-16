@@ -29,14 +29,8 @@ logger = logging.getLogger("Mobot")
 
 def mobot_default_setup(cfg,args):
 
-    cfg.DATASETS.TRAIN = args.train
-    cfg.DATASETS.TEST = args.test
-    logger.info('Training set:',args.train)
-    logger.info('Validation set:',args.test)
-
     cfg.OUTPUT_DIR=args.output_dir
     check_path(cfg.OUTPUT_DIR)
-
 
     cfg.DATALOADER.SHUFFLE = True
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128 
@@ -119,13 +113,24 @@ def mobot_argument_parser(epilog=None):
     parser.add_argument(
         "opts",
         help="""
-Modify config options at the end of the command. For Yacs configs, use
-space-separated "PATH.KEY VALUE" pairs.
-For python-based LazyConfig, use "path.key=value".
+        Modify config options at the end of the command. For Yacs configs, use
+        space-separated "PATH.KEY VALUE" pairs.
+        For python-based LazyConfig, use "path.key=value".
         """.strip(),
         default=None,
         nargs=argparse.REMAINDER,
     )
+
+    # For prediction
+    parser.add_argument(
+        "--input",
+        nargs="+",
+        default = None,
+        help="A list of space separated input images; "
+        "or a single glob pattern such as 'directory/*.jpg'",
+    )
+    parser.add_argument("--webcam", action="store_true", help="Take inputs from webcam.")
+    parser.add_argument("--video-input", default = None,help="Path to video file.")
     return parser
 
 

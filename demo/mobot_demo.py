@@ -16,21 +16,25 @@ from detectron2.utils.logger import setup_logger
 from mobot.engine import mobot_default_setup
 
 from predictor import VisualizationDemo
-
+from mobot.engine import mobot_argument_parser
 # constants
 WINDOW_NAME = "COCO detections"
 
 
 def setup_cfg(args):
     # load config from file and command-line arguments
+
     cfg = get_cfg()
-    mobot_default_setup(cfg)
+    args.output = args.output_dir
+    
+    mobot_default_setup(cfg,args)
     # To use demo for Panoptic-DeepLab, please uncomment the following two lines.
     # from detectron2.projects.panoptic_deeplab import add_panoptic_deeplab_config  # noqa
     # add_panoptic_deeplab_config(cfg)
     cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
-    # Set score_threshold for builtin models
+    print('Merge the config file from:',args.config_file)
+    cfg.MODEL.WEIGHTS = args.model
+    print('Use model weights from:', args.model)
     
     cfg.VIS_PERIOD = 100
     cfg.freeze()
@@ -93,7 +97,7 @@ def test_opencv_video_format(codec, file_ext):
 
 if __name__ == "__main__":
     mp.set_start_method("spawn", force=True)
-    args = get_parser().parse_args()
+    args = mobot_argument_parser().parse_args()
     setup_logger(name="fvcore")
     logger = setup_logger()
     logger.info("Arguments: " + str(args))

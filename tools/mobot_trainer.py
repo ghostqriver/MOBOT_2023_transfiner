@@ -58,6 +58,12 @@ def setup(args):
     cfg.MODEL.WEIGHTS = args.model
     print('Use model weights from:', args.model)
     
+    cfg.DATASETS.TRAIN = args.train
+    cfg.DATASETS.TEST = args.test
+    
+    logger.info('Training set:',args.train)
+    logger.info('Validation set:',args.test)
+    
     mobot_default_setup(cfg,args)
     default_setup(
         cfg, args
@@ -67,9 +73,7 @@ def setup(args):
     
     cfg.DATALOADER.NUM_WORKERS = 2 
     cfg.DATALOADER.SHUFFLE = True
-    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128 
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set the testing threshold for this model
+ # set the testing threshold for this model
 
     cfg.SOLVER.BASE_LR = args.base_ir # pick a good LR 0.00025
     cfg.SOLVER.MAX_ITER = args.max_iter
