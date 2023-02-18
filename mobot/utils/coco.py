@@ -7,6 +7,7 @@ import random
 import copy
 import json
 import tqdm
+from shapely.geometry import Polygon
 
 import detectron2
 from detectron2.data import MetadataCatalog, DatasetCatalog
@@ -96,10 +97,13 @@ def coco_rm_cat(json_file,image_root):
         num_side = 0
         for ind,anno in enumerate(d['annotations']):
             class_ = anno['category_id']
+            polygon = list(zip(anno['segmentation'][0][0::2],anno['segmentation'][0][1::2]))
+            area = Polygon(polygon).area
             if class_ == 1: 
                 num_side += 1
                 pass
             else:
+                anno['area'] = area
                 anno['image_id'] = d['image_id'] 
                 new_anno.append(anno)
         d['annotations'] = new_anno

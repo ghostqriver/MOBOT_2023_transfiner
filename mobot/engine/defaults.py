@@ -4,6 +4,8 @@ import os
 import warnings
 import logging
 from collections import OrderedDict
+import numpy as np
+
 import torch
 from torch.nn.parallel import DistributedDataParallel
 
@@ -23,6 +25,7 @@ from detectron2.utils.events import EventStorage
 from detectron2.config import get_cfg
 
 from mobot.utils import check_path
+from mobot.utils import (read_scores,plot_test)
 
 logger = logging.getLogger("Mobot")
 
@@ -193,9 +196,10 @@ class Mobot_DefaultTrainer(DefaultTrainer):
         #     lr_list = gen_lr_list_choosing_lr(cfg, start_iter, min_lr, max_lr)
         # else:
         #     use_scheduler = True
-        start_iter = (
-        checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
-        )
+        start_iter = 0
+        # (
+        # checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
+        # )
 
         periodic_checkpointer = PeriodicCheckpointer(
             checkpointer, cfg.SOLVER.CHECKPOINT_PERIOD, max_iter=max_iter
@@ -214,7 +218,9 @@ class Mobot_DefaultTrainer(DefaultTrainer):
     # train_losses = 0
     # test_acc = OrderedDict()
     # train_loss_list = OrderedDict()
-    
+
+        res_dict = OrderedDict()
+
         with EventStorage(start_iter) as storage:
             for data, iteration in zip(data_loader, range(start_iter, max_iter)):
             
@@ -241,9 +247,14 @@ class Mobot_DefaultTrainer(DefaultTrainer):
                 ):
                     model.eval()
                     with torch.no_grad():
-                        Mobot_DefaultTrainer.test(cfg,model)
+                        res = Mobot_DefaultTrainer.test(cfg,model)
                     # Compared to "train_net.py", the test results are not dumped to EventStorage
                     comm.synchronize()
+
+                    model_name = 'model_'+str(iteration).zfill(7)
+                    res_dict[model_name] = res
+                    np.save(cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'.pth', res_dict)
+
                     model.train()
                 if iteration - start_iter > 5 and (
                     (iteration + 1) % 20 == 0 or iteration == max_iter - 1
@@ -252,6 +263,7 @@ class Mobot_DefaultTrainer(DefaultTrainer):
                         writer.write()
                 periodic_checkpointer.step(iteration)
 
+        plot_test(read_scores(res_dict))
                 # if use_scheduler == False:
                 #     optimizer.param_groups[0]["lr"] = lr_list[iteration] 
                 

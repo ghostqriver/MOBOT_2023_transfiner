@@ -26,6 +26,7 @@ from detectron2.utils.events import EventStorage
 import warnings
 
 
+
 logger = logging.getLogger("Mobot")
 
 # If call by functions
@@ -106,7 +107,7 @@ def main(args):
         if comm.is_main_process():
             verify_results(cfg, res)
         return res
-
+    
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=args.resume)
     if cfg.TEST.AUG.ENABLED:
