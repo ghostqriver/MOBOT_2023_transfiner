@@ -332,7 +332,7 @@ def Mobot_Dataset_Register():
         register_coco_instances("MOBOT_Train_denoise", {}, "Datasets/Train/Train_denoise.json", "Datasets/Train",)
         
         register_coco_instances("MOBOT_Val", {}, "Datasets/Val/Val.json", "Datasets/Val",)   
-
+        
         register_coco_instances("MOBOT_Val_denoise", {}, "Datasets/Val/Val_denoise.json", "Datasets/Val",)   
 
         register_coco_instances("MOBOT_Test", {}, "Datasets/Test/Test.json", "Datasets/Test",)   
@@ -340,7 +340,12 @@ def Mobot_Dataset_Register():
         register_coco_instances("MOBOT_Test_denoise", {}, "Datasets/Test/Test_denoise.json", "Datasets/Test",)   
 
 
-        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise']:
+        # dataset only contain end sections
+        register_coco_instances("MOBOT_Train_end", {}, "Datasets/Train/Train_end.json", "Datasets/Train",)
+        register_coco_instances("MOBOT_Val_end", {}, "Datasets/Val/Val_end.json", "Datasets/Val",)   
+        register_coco_instances("MOBOT_Test_end", {}, "Datasets/Test/Test_end.json", "Datasets/Test",)   
+
+        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise','Train_end','Val_end','Test_end']:
             MetadataCatalog.get("MOBOT_"+i).set(thing_classes=['end','side'])
             MetadataCatalog.get("MOBOT_"+i).set(thing_colors=[(255, 0, 0),(0, 255, 0)])
 
@@ -358,6 +363,14 @@ def Mobot_Dataset_Register():
         DatasetCatalog.remove("MOBOT_Test_denoise")
         MetadataCatalog.remove("MOBOT_Test_denoise")
         
+        DatasetCatalog.remove("MOBOT_Train_end")
+        MetadataCatalog.remove("MOBOT_Train_end")
+        DatasetCatalog.remove("MOBOT_Val_end")
+        MetadataCatalog.remove("MOBOT_Val_end")
+        DatasetCatalog.remove("MOBOT_Test_end")
+        MetadataCatalog.remove("MOBOT_Test_end")
+
+
         register_coco_instances("MOBOT_Train", {}, "Datasets/Train/Train.json", "Datasets/Train",)
         
         register_coco_instances("MOBOT_Train_denoise", {}, "Datasets/Train/Train_denoise.json", "Datasets/Train",)
@@ -370,8 +383,12 @@ def Mobot_Dataset_Register():
 
         register_coco_instances("MOBOT_Test_denoise", {}, "Datasets/Test/Test_denoise.json", "Datasets/Test",)   
 
+        # dataset only contain end sections
+        register_coco_instances("MOBOT_Train_end", {}, "Datasets/Train/Train_end.json", "Datasets/Train",)
+        register_coco_instances("MOBOT_Val_end", {}, "Datasets/Val/Val_end.json", "Datasets/Val",)   
+        register_coco_instances("MOBOT_Test_end", {}, "Datasets/Test/Test_end.json", "Datasets/Test",)  
 
-        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise']:
+        for i in ['Train','Train_denoise','Val','Val_denoise','Test','Test_denoise','Train_end','Val_end','Test_end']:
             MetadataCatalog.get("MOBOT_"+i).set(thing_classes=['end','side'])
             MetadataCatalog.get("MOBOT_"+i).set(thing_colors=[(255, 0, 0),(0, 255, 0)])
  
