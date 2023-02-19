@@ -56,3 +56,9 @@ def plot_test(model_APs):
     plt.rcParams.update({'font.size':legendsize})
     plt.legend()
     plt.show()
+
+def plot(list):
+
+    plt.plot(list,marker='.',c=c_vline,linewidth=linewidth)
+    plt.show()
+

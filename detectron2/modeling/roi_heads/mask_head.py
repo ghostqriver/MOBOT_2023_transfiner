@@ -538,7 +538,7 @@ class BaseMaskRCNNHead(nn.Module):
             return {"loss_mask": loss_masks * self.loss_weight, "loss_mask_uncertain": loss_mask_uncertains * self.loss_weight * 0.5, "loss_mask_refine": loss_mask_refine, "loss_semantic": loss_semantic, "loss_bound": loss_bound * 0.5}
         else:
             # Modified for saving GPU during validation
-            LIMIT = 10
+            LIMIT = 0
             pred_mask_logits_uncertain = x_uncertain[:, 0][:LIMIT]
             pred_mask_logits_uncertain_lg = F.interpolate(pred_mask_logits_uncertain.unsqueeze(1), (56, 56))
             pred_mask_logits_uncertain_lg_l = F.interpolate(pred_mask_logits_uncertain.unsqueeze(1), (112, 112))

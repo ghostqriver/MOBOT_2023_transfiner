@@ -12,11 +12,6 @@ from torch.nn.parallel import DistributedDataParallel
 import detectron2.utils.comm as comm
 from detectron2.checkpoint import DetectionCheckpointer, PeriodicCheckpointer
 from detectron2.config import get_cfg
-from detectron2.data import (
-    MetadataCatalog,
-    build_detection_test_loader,
-    build_detection_train_loader,
-)
 from detectron2.engine import  default_setup, default_writers, launch,hooks
 from mobot.engine import mobot_argument_parser,Mobot_Dataset_Register,Mobot_Default_Setting,mobot_default_setup
 from mobot.engine import Mobot_DefaultTrainer as Trainer
@@ -25,9 +20,6 @@ from detectron2.evaluation import (
     print_csv_format,
     verify_results
 )
-from detectron2.modeling import build_model
-from detectron2.solver import build_lr_scheduler, build_optimizer
-from detectron2.utils.events import EventStorage
 
 from mobot.utils import (
     check_path,
@@ -146,16 +138,17 @@ def main(args):
         )
         res = Trainer.test(cfg,model)
 
-        # if cfg.TEST.AUG.ENABLED:
-        #     res.update(Trainer.test_with_TTA(cfg, model))
-        # if comm.is_main_process():
-        #     verify_results(cfg, res)
+        if cfg.TEST.AUG.ENABLED:
+            res.update(Trainer.test_with_TTA(cfg, model))
+        if comm.is_main_process():
+            verify_results(cfg, res)
+
         res_dict[model_name] = res
         torch.cuda.empty_cache()
 
         np.save(cfg.OUTPUT_DIR+'/'+file_name, res_dict)
     
-    plot_test(read_scores(res_dict))
+    plot_test(read_scores(cfg.OUTPUT_DIR+'/'+file_name))
 
     # return res_list
   

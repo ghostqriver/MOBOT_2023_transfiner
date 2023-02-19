@@ -56,6 +56,10 @@ def setup(args):
     cfg = get_cfg()
     cfg.merge_from_file(args.config_file)
     print('Merge the config file from:',args.config_file)
+    
+    # Read extra parameters
+    cfg.merge_from_list(args.opts)
+
     cfg.MODEL.WEIGHTS = args.model
     print('Use model weights from:', args.model)
     

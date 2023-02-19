@@ -25,7 +25,7 @@ from detectron2.utils.events import EventStorage
 from detectron2.config import get_cfg
 
 from mobot.utils import check_path
-from mobot.utils import (read_scores,plot_test)
+from mobot.utils import (read_scores,plot_test,plot)
 
 logger = logging.getLogger("Mobot")
 
@@ -114,7 +114,7 @@ def mobot_argument_parser(epilog=None):
         "https://pytorch.org/docs/stable/distributed.html for details.",
     )
     parser.add_argument(
-        "opts",
+        "--opts",
         help="""
         Modify config options at the end of the command. For Yacs configs, use
         space-separated "PATH.KEY VALUE" pairs.
@@ -196,10 +196,12 @@ class Mobot_DefaultTrainer(DefaultTrainer):
         #     lr_list = gen_lr_list_choosing_lr(cfg, start_iter, min_lr, max_lr)
         # else:
         #     use_scheduler = True
+        # if resume:
+        #     start_iter = (
+        #     checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
+        #     )
+        # else:
         start_iter = 0
-        # (
-        # checkpointer.resume_or_load(cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
-        # )
 
         periodic_checkpointer = PeriodicCheckpointer(
             checkpointer, cfg.SOLVER.CHECKPOINT_PERIOD, max_iter=max_iter
@@ -218,12 +220,12 @@ class Mobot_DefaultTrainer(DefaultTrainer):
     # train_losses = 0
     # test_acc = OrderedDict()
     # train_loss_list = OrderedDict()
-
+        lrs = []
         res_dict = OrderedDict()
-
+        
         with EventStorage(start_iter) as storage:
             for data, iteration in zip(data_loader, range(start_iter, max_iter)):
-            
+                lrs.append(optimizer.param_groups[0]["lr"])
                 storage.iter = iteration
                 loss_dict = model(data)
                 losses = sum(loss_dict.values())
@@ -253,7 +255,7 @@ class Mobot_DefaultTrainer(DefaultTrainer):
 
                     model_name = 'model_'+str(iteration).zfill(7)
                     res_dict[model_name] = res
-                    np.save(cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'.pth', res_dict)
+                    np.save(cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'train_from'+str(start_iter), res_dict)
 
                     model.train()
                 if iteration - start_iter > 5 and (
@@ -263,7 +265,8 @@ class Mobot_DefaultTrainer(DefaultTrainer):
                         writer.write()
                 periodic_checkpointer.step(iteration)
 
-        plot_test(read_scores(res_dict))
+        plot(lrs)
+        # plot_test(read_scores(res_dict))
                 # if use_scheduler == False:
                 #     optimizer.param_groups[0]["lr"] = lr_list[iteration] 
                 
