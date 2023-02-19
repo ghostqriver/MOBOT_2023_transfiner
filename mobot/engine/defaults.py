@@ -82,7 +82,7 @@ def mobot_argument_parser(epilog=None):
 
     parser.add_argument("--output-dir", default=None, help="output directory")
 
-    parser.add_argument("--base-ir", type=float,default=0.01, help="base ir")
+    parser.add_argument("--base-lr", type=float,default=0.01, help="base ir")
 
     parser.add_argument("--max-iter",type=int,default=None, help="max iter")
     
@@ -223,6 +223,8 @@ class Mobot_DefaultTrainer(DefaultTrainer):
         lrs = []
         res_dict = OrderedDict()
         
+        res_file_name = cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'_train'
+        lr_file_name = cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'_train_lr'
         with EventStorage(start_iter) as storage:
             for data, iteration in zip(data_loader, range(start_iter, max_iter)):
                 lrs.append(optimizer.param_groups[0]["lr"])
@@ -255,17 +257,26 @@ class Mobot_DefaultTrainer(DefaultTrainer):
 
                     model_name = 'model_'+str(iteration).zfill(7)
                     res_dict[model_name] = res
-                    np.save(cfg.OUTPUT_DIR+'/'+cfg.OUTPUT_DIR+'train_from'+str(start_iter), res_dict)
 
+
+                    np.save(res_file_name+'.npy', res_dict)
+                    np.save(lr_file_name+'.npy', lrs)
+                    
                     model.train()
+
                 if iteration - start_iter > 5 and (
                     (iteration + 1) % 20 == 0 or iteration == max_iter - 1
                 ):
                     for writer in writers:
                         writer.write()
                 periodic_checkpointer.step(iteration)
+                np.save(res_file_name+'.npy', res_dict)
+                np.save(lr_file_name+'.npy', lrs)
 
-        plot(lrs)
+                plot_test(read_scores(res_file_name+'.npy'),res_file_name+'.png')
+                plot(lrs,lr_file_name+'.png')
+
+        # plot(lrs)
         # plot_test(read_scores(res_dict))
                 # if use_scheduler == False:
                 #     optimizer.param_groups[0]["lr"] = lr_list[iteration] 

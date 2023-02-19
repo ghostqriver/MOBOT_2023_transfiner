@@ -80,7 +80,7 @@ def setup(args):
     cfg.DATALOADER.SHUFFLE = True
  # set the testing threshold for this model
 
-    cfg.SOLVER.BASE_LR = args.base_ir # pick a good LR 0.00025
+    cfg.SOLVER.BASE_LR = args.base_lr # pick a good LR 0.00025
     cfg.SOLVER.MAX_ITER = args.max_iter
     # cfg.SOLVER.STEPS = args.steps    
     cfg.SOLVER.CHECKPOINT_PERIOD = args.checkpoint_period # Save the checkpoint each 2000 iterations 

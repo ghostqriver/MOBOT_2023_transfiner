@@ -30,7 +30,7 @@ def read_scores(test_file):
     return model_APs
 
 
-def plot_test(model_APs):
+def plot_test(model_APs,im_name=None):
 
     models = model_APs.keys()
     x_axis = list(map(lambda x:x.split('_')[-1][-5:],models))
@@ -55,10 +55,11 @@ def plot_test(model_APs):
     np.argmax(segm_AP_ends)
     plt.rcParams.update({'font.size':legendsize})
     plt.legend()
-    plt.show()
+    if im_name != None:
+        plt.savefig(im_name)
 
-def plot(list):
-
+def plot(list,im_name=None):
     plt.plot(list,marker='.',c=c_vline,linewidth=linewidth)
-    plt.show()
+    if im_name != None:
+        plt.savefig(im_name)
 

@@ -28,6 +28,8 @@ from mobot.utils import (
     read_finalfoldername
     )
 from mobot.utils import (read_scores,plot_test)
+import matplotlib.pyplot as plt
+
 
 logger = logging.getLogger("Mobot")
 
@@ -62,7 +64,7 @@ def read_models(args):
     else:
         models = [args.model]
         file_name = read_filename(args.model)
-    return models,file_name+'_test.npy'
+    return models,file_name+'_test'
 
 
 def test_setup(cfg,model):
@@ -107,7 +109,7 @@ def setup(args):
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 2  
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5  # set the testing threshold for this model
     
-    cfg.SOLVER.BASE_LR = args.base_ir # pick a good LR 0.00025
+    cfg.SOLVER.BASE_LR = args.base_lr # pick a good LR 0.00025
     cfg.SOLVER.MAX_ITER = args.max_iter
     # cfg.SOLVER.STEPS = args.steps    
     cfg.SOLVER.CHECKPOINT_PERIOD = args.checkpoint_period # Save the checkpoint each 2000 iterations 
@@ -126,7 +128,9 @@ def main(args):
     res_dict = OrderedDict()
     cfg = setup(args)
 
-    models,file_name = read_models(args)
+    models,name = read_models(args)
+    np_file_name = cfg.OUTPUT_DIR+'/'+name+'.npy'
+    img_name = cfg.OUTPUT_DIR+'/'+name+'.png'
 
     for model in models:
         model_name = read_filename(model)
@@ -145,10 +149,13 @@ def main(args):
 
         res_dict[model_name] = res
         torch.cuda.empty_cache()
-
-        np.save(cfg.OUTPUT_DIR+'/'+file_name, res_dict)
+        
+        np.save(np_file_name,res_dict)
     
-    plot_test(read_scores(cfg.OUTPUT_DIR+'/'+file_name))
+    if len(models) > 1:
+        plot_test(read_scores(np_file_name),img_name)
+    else:
+        print(read_scores(np_file_name))
 
     # return res_list
   
