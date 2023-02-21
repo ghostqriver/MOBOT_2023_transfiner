@@ -1,18 +1,18 @@
 # MOBOT's detector implemented by Mask Transfiner
 
-The MOBOT project's Instance Segmentation model is based on [Transfiner(https://github.com/SysCV/transfiner)] method.
+The MOBOT project's Instance Segmentation model is based on [Transfiner](https://github.com/SysCV/transfiner) method.
 
 > [**Mask Transfiner for High-Quality Instance Segmentation**](https://arxiv.org/abs/2111.13673)           
 > Lei Ke, Martin Danelljan, Xia Li, Yu-Wing Tai, Chi-Keung Tang, Fisher Yu  
 > CVPR, 2022
 
-The training code is built on the open-source [detectron2(https://github.com/facebookresearch/detectron2)].
+The training code is built on the open-source [detectron2](https://github.com/facebookresearch/detectron2).
 
 > Detectron2          
 > Yuxin Wu, Alexander Kirillov, Francisco Massa, Wan-Yen Lo, Ross Girshick
 > 2019
 
-<!-- 
+/* 
 
 Highlights
 -----------------
@@ -177,4 +177,4 @@ for swin-based model:
 ```
 bash scripts/visual_swinb.sh
 ```
- --> 
+*/
