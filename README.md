@@ -1,15 +1,18 @@
 # MOBOT's detector implemented by Mask Transfiner
-Mask Transfiner for High-Quality Instance Segmentation [Mask Transfiner, CVPR 2022].
 
-This is the official pytorch implementation of [Transfiner](https://arxiv.org/abs/2111.13673) built on the open-source detectron2. Our project website contains more information, including the visual slider comparison: [vis.xyz/pub/transfiner](https://www.vis.xyz/pub/transfiner/).
+The MOBOT project's Instance Segmentation model is based on [Transfiner(https://github.com/SysCV/transfiner)] method.
 
 > [**Mask Transfiner for High-Quality Instance Segmentation**](https://arxiv.org/abs/2111.13673)           
 > Lei Ke, Martin Danelljan, Xia Li, Yu-Wing Tai, Chi-Keung Tang, Fisher Yu  
 > CVPR, 2022
 
-Updates
------------------
-:fire::fire: We released the [Video Mask Transfiner and HQ-YTVIS benchmark](https://github.com/SysCV/vmt) in ECCV'2022.
+The training code is built on the open-source [detectron2(https://github.com/facebookresearch/detectron2)].
+
+> Detectron2          
+> Yuxin Wu, Alexander Kirillov, Francisco Massa, Wan-Yen Lo, Ross Girshick
+> 2019
+
+<!-- 
 
 Highlights
 -----------------
@@ -174,35 +177,4 @@ for swin-based model:
 ```
 bash scripts/visual_swinb.sh
 ```
-
-Citation
----------------
-If you find Mask Transfiner useful in your research or refer to the provided baseline results, please star :star: this repository and consider citing :pencil::
-```
-@inproceedings{transfiner,
-    author={Ke, Lei and Danelljan, Martin and Li, Xia and Tai, Yu-Wing and Tang, Chi-Keung and Yu, Fisher},
-    title={Mask Transfiner for High-Quality Instance Segmentation},
-    booktitle = {CVPR},
-    year = {2022}
-}  
-
-```
-If you are interested in [Video Mask Transfiner and High-Quality Video Instance Segmentation data](https://github.com/SysCV/vmt):
-```
-@inproceedings{vmt,
-    title = {Video Mask Transfiner for High-Quality Video Instance Segmentation},
-    author = {Ke, Lei and Ding, Henghui and Danelljan, Martin and Tai, Yu-Wing and Tang, Chi-Keung and Yu, Fisher},
-    booktitle = {European Conference on Computer Vision (ECCV)},
-    year = {2022}
-}
-```
-
-Related Links
----------------
-Related NeurIPS 2021 Work on multiple object tracking & segmentation: [PCAN](https://github.com/SysCV/pcan)
-
-Related CVPR 2021 Work on occlusion-aware instance segmentation: [BCNet](https://github.com/lkeab/BCNet)
-
-Related ECCV 2020 Work on partially supervised instance segmentation: [CPMask](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123530375.pdf)
-
-
+ --> 
