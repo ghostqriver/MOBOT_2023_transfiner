@@ -48,3 +48,31 @@ def reload(module):
 
 def model_summary(model,im_shape):
     return summary(model,im_shape)
+    
+
+def frame2video(frame_path,file_name=None):
+
+    if file_name == None:
+        file_name = frame_path+'.mp4'
+
+    frames = glob.glob(frame_path+'/*.png')
+
+    img0 = cv.imread(frames[0])
+
+
+    height,width = img0.shape[:2]
+
+    video_writer = cv.VideoWriter(file_name, fourcc=cv.VideoWriter_fourcc(*"mp4v"), fps=30, frameSize=(width, height), isColor=True)
+
+    for frame in tqdm.tqdm(frames):
+
+        img = cv.imread(frame)
+
+        video_writer.write(img)
+
+    video_writer.release()
+
+    print('Saved video as',file_name)
+
+    return file_name
+        
