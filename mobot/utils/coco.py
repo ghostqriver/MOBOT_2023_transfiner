@@ -11,7 +11,7 @@ from shapely.geometry import Polygon
 
 import detectron2
 from detectron2.data import MetadataCatalog, DatasetCatalog
-
+from .annos import get_coco_json_format
 
 def coco_json_show(json_file,image_path,image_name=None):
     
@@ -68,10 +68,13 @@ def coco_json_read(json_file):
     Given the path of json_file, read the informations of this json
     json_file: the path of the json
     '''
+    if type(json_file) is str:
+        coco = COCO(json_file)
+        print("In json file",json_file)
+    else:
+        coco = json_file
+        
 
-    coco = COCO(json_file)
-
-    print("In json file",json_file)
     print("*"*40)
 
     print("Images:",len(coco.getImgIds()))
@@ -86,51 +89,32 @@ def coco_json_read(json_file):
     print("*"*40)
 
 
-def coco_rm_cat(json_file,image_root):
-    "A template for removing specific annotations in the coco json file"
-    json_ = detectron2.data.datasets.load_coco_json(json_file, image_root, "MOBOT_Train", extra_annotation_keys=None)
-    new_json = []
-    print('Filtering...')
-    for d in tqdm.tqdm(json_):
-        d_ = copy.deepcopy(d)
-        new_anno = []
-        num_side = 0
-        for ind,anno in enumerate(d['annotations']):
-            class_ = anno['category_id']
-            polygon = list(zip(anno['segmentation'][0][0::2],anno['segmentation'][0][1::2]))
-            area = Polygon(polygon).area
-            if class_ == 1: 
-                num_side += 1
-                pass
-            else:
-                anno['area'] = area
-                anno['image_id'] = d['image_id'] 
-                new_anno.append(anno)
-        d['annotations'] = new_anno
-        new_json.append(d)
-        
-    new_annotations = []
-    id = 0
-    print('Transforming...')
-    for j in tqdm.tqdm(new_json):
-        for anno in j['annotations']:
-            anno_ = copy.deepcopy(anno)
-            anno_['id'] = id
-            del anno_['bbox_mode']
-            new_annotations.append(anno_)
-            id += 1
+def rm_cat_coco(json_path,cat_id):
+    coco = COCO(json_path)
+    print('In original json:')
+    coco_json_read(coco) 
 
-    print('Saving...')
-    with open(json_file,'r+') as file:
-        content=file.read()
+    json_ = json.load(open(json_path,'r'))
+    coco_format = get_coco_json_format()
+    coco_format['info'] = json_['info']
+    coco_format['licenses'] = json_['licenses']
+    coco_format['images'] = json_['images']
+    cats = json_['categories']
+    coco_format['categories'] = list(filter(lambda cat:cat['id'] != cat_id,cats))
 
-    json_origin=json.loads(content) # modify the json_origin['annotations']
+    rm_cat = list(filter(lambda cat:cat['id'] == cat_id,cats))
+    if len(rm_cat) != 1:
+        raise BaseException('Does not exist this category in json')
+    else:
+        rm_cat = rm_cat[0]['name']
+    new_json = json_path.split('.')[-2]+'_remove'+rm_cat
 
-    json_origin['annotations'] = new_annotations
+    annIds = coco.getAnnIds()
+    coco_format['annotations'] = list(filter(lambda ann:ann['category_id'] != cat_id,[coco.loadAnns(annId)[0] for annId in annIds]))
 
-    new_json=json.dumps(json_origin)
+    with open(new_json,"w") as outfile:
+        json.dump(coco_format, outfile)
+    print('Saved removed categroy',cat_id,'json file in',new_json)
+    print('In new json:')
+    coco_json_read(new_json) 
 
-    with open(json_file.split('.')[0]+'_end.json','w+') as file:
-        file.write(new_json)
-
-    print('Saved in',json_file.split('.')[0]+'_end.json')

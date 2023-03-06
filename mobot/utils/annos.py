@@ -41,6 +41,7 @@ import json
 import glob
 from tqdm import tqdm
 
+
 def create_sub_masks(mask_image, width, height):
     # Initialize a dictionary of sub-masks indexed by RGB colors
     sub_masks = {}
@@ -63,6 +64,7 @@ def create_sub_masks(mask_image, width, height):
             sub_masks[pixel_str].putpixel((x+1, y+1), 1)
 
     return sub_masks
+
 
 def create_sub_mask_annotation(sub_mask):
     # Find contours (boundary lines) around each sub-mask
@@ -96,6 +98,7 @@ def create_sub_mask_annotation(sub_mask):
     
     return polygons, segmentations
 
+
 def create_category_annotation(category_dict):
     category_list = []
 
@@ -109,6 +112,7 @@ def create_category_annotation(category_dict):
 
     return category_list
 
+
 def create_image_annotation(file_name, width, height, image_id):
     images = {
         "file_name": file_name,
@@ -118,6 +122,7 @@ def create_image_annotation(file_name, width, height, image_id):
     }
 
     return images
+
 
 def create_annotation_format(polygon, segmentation, image_id, category_id, annotation_id):
     min_x, min_y, max_x, max_y = polygon.bounds
@@ -137,6 +142,7 @@ def create_annotation_format(polygon, segmentation, image_id, category_id, annot
     }
 
     return annotation
+
 
 def get_coco_json_format():
     # Standard COCO format 
