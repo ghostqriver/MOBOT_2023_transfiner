@@ -3,7 +3,10 @@ Functions to transform the mask annotations to coco-json.
 Source: https://github.com/chrise96/image-to-coco-json-converter
 Customize the global parameters before call the functions.
 E.g.
-coco_transformer('')
+
+from mobot.utils.annos import *
+
+coco_transformer('Datasets/2022-09-16/masks/')
 
 '''
 
@@ -224,7 +227,7 @@ def images_annotations_info(maskpath):
     
 def coco_transformer(mask_path,json_file=None):
     
-    if json_file_name is None:
+    if json_file is None:
         json_file = mask_path + mask_path.split('/')[-2] + '.json'
     
     #Create annotation
