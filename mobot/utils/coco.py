@@ -20,9 +20,7 @@ def coco_json_show(json_file,image_path,image_name=None):
     json_file: the path of the json
     image_path: the path contain the images in the json
     image_name: a certain file name, if given will only show this image
-
     '''
-
     coco = COCO(json_file)
 
     if image_name == None:
@@ -56,7 +54,6 @@ def coco_json_show(json_file,image_path,image_name=None):
             left = annsInfo[j]['bbox'][0]
             top = annsInfo[j]['bbox'][1]
             plt.text(left,top+15,coco.loadCats(annsInfo[j]['category_id'])[0]['supercategory'],fontsize=10)
-
 
         plt.title(img_name)
         plt.show()
@@ -107,7 +104,7 @@ def rm_cat_coco(json_path,cat_id):
         raise BaseException('Does not exist this category in json')
     else:
         rm_cat = rm_cat[0]['name']
-    new_json = json_path.split('.')[-2]+'_remove'+rm_cat
+    new_json = json_path.split('.')[-2]+'_remove'+rm_cat+'.json'
 
     annIds = coco.getAnnIds()
     coco_format['annotations'] = list(filter(lambda ann:ann['category_id'] != cat_id,[coco.loadAnns(annId)[0] for annId in annIds]))
@@ -117,4 +114,26 @@ def rm_cat_coco(json_path,cat_id):
     print('Saved removed categroy',cat_id,'json file in',new_json)
     print('In new json:')
     coco_json_read(new_json) 
+
+
+def areas_hist(json_path,splits=5):
+    '''
+    Visualize the area histograms of the dataset.
+    It is a tool for deciding a area threshold as the noise threshold 
+    '''
+    coco = COCO(json_path)
+    annIds = coco.getAnnIds()
+    areas = [coco.loadAnns(annId)[0]['area'] for annId in annIds]
+    areas.sort()
+    
+    until = len(areas)
+    plt.figure(figsize=(3*splits,3))
+    
+    for split in range(splits):
+        plt.subplot(1,splits,split+1)
+        _ = plt.hist(areas[:until],bins=50)
+        until = int(until/2)
+        plt.xlabel('area')
+    plt.show()
+    return areas
 
