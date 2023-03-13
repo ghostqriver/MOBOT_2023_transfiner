@@ -43,13 +43,12 @@ def coco_json_show(json_file,image_path,image_name=None):
     
 
         # Show the image
-        plt.figure(figsize=(15,15))
+        plt.figure(figsize=(8,8))
         plt.imshow(im[:,:,[2,1,0]])
         plt.axis('off')
         coco.showAnns(annsInfo, True)
 
         # Show the text for each bbox
-        coordinates=[]
         for j in range(len(annsInfo)):
             left = annsInfo[j]['bbox'][0]
             top = annsInfo[j]['bbox'][1]
